@@ -10,6 +10,7 @@ type Config struct {
 	Version   string         `mapstructure:"version"`
 	WebServer WebServer      `mapstructure:"server"`
 	DB        DatabaseConfig `mapstructure:"database"`
+	Aws       AwsConfig      `mapstructure:"aws"`
 }
 
 type DatabaseConfig struct {
@@ -19,6 +20,16 @@ type DatabaseConfig struct {
 
 type WebServer struct {
 	Port string `mapstructure:"port"`
+}
+
+type AwsConfig struct {
+	Region string       `mapstructure:"region"`
+	Kms    AwsKmsConfig `mapstructure:"kms"`
+}
+
+type AwsKmsConfig struct {
+	EncryptionKey string `mapstructure:"encryption_key"`
+	JwtKey        string `mapstructure:"jwt_key"`
 }
 
 var AppConfig *Config
