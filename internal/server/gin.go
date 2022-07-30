@@ -15,3 +15,9 @@ func StartWebServer(port string) {
 
 	r.Run(":" + port)
 }
+
+func StartEmbeded(r *gin.Engine) *gin.Engine {
+	r.POST("/sendgrid", controllers.EmailReceiver)
+
+	return r
+}
