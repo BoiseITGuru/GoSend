@@ -1,0 +1,18 @@
+{
+    "version": "0.0.1",
+    "database": {
+        "gorm_engine": "mysql",
+        "gorm_connection": "<username>:<password>@tcp(<db url/ip>:<db port>)/<db name>?parseTime=true"
+    },
+    "server": {
+        "port": 8080
+    },
+    "aws": {
+        "region": "us-west-2",
+        "kms": {
+            "encryption_key": "arn:aws:kms:us-west-2:",
+            "app_key": "arn:aws:kms:us-west-2:",
+            "jwt_key": "arn:aws:kms:us-west-2:"
+        }
+    }
+}
