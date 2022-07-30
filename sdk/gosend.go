@@ -1,30 +1,58 @@
 package sdk
 
 import (
-	"log"
-
-	"gorm.io/driver/mysql"
+	"github.com/eurekadao/gosend/internal/amazon"
+	"github.com/eurekadao/gosend/internal/auth"
+	"github.com/eurekadao/gosend/internal/controllers"
+	"github.com/eurekadao/gosend/internal/database"
+	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
 
-type SDK struct {
-	Database *gorm.DB
+type SdkConfig struct {
+	Instance      *gorm.DB
+	Region        string
+	EncryptionKey string
+	JwtKey        string
+	Port          string
 }
 
-func Connect(connectionString string) SDK {
-	var sdk *SDK
-	var dbError error
+type Server struct {
+	port string
+	keys amazon.KmsKeys
+	aws  *amazon.AwsSvc
+}
 
-	sdk.Database, dbError = gorm.Open(mysql.Open(connectionString), &gorm.Config{})
-	if dbError != nil {
-		log.Fatal(dbError)
-		panic("Cannot connect to GoSend Database")
+func (config *SdkConfig) Configure() Server {
+	var s Server
+
+	database.SdkDbStart(config.Instance)
+	s.port = config.Port
+
+	// Initialize AWS Defaults
+	s.keys = amazon.KmsKeys{
+		EncryptionKey: config.EncryptionKey,
+		JwtKey:        config.JwtKey,
 	}
-	log.Println("Connected to GoSend Database!")
+	s.aws = amazon.BuildAWSClient(config.Region, s.keys)
 
-	return *sdk
+	return s
 }
 
-func (sdk *SDK) CreateMailbox(name string, addresses []string) bool {
+func (s Server) Start() {
+	s.aws.Init()
+
+	// Initialize Auth System
+	auth.Init()
+
+	r := gin.Default()
+
+	// SendGrid Email Receiver Endpoint
+	r.POST("/sendgrid", controllers.EmailReceiver)
+
+	r.Run(":" + s.port)
+}
+
+func (s *Server) CreateMailbox(name string, addresses []string) bool {
 	return false
 }

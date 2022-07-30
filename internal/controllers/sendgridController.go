@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/eurekadao/gosend/internal/database"
-	"github.com/eurekadao/gosend/internal/models"
+	"github.com/eurekadao/gosend/models"
 	"github.com/gin-gonic/gin"
 )
 

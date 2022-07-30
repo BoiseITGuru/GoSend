@@ -1,10 +1,8 @@
 package main
 
 import (
-	"github.com/eurekadao/gosend/internal/amazon"
-	"github.com/eurekadao/gosend/internal/auth"
 	"github.com/eurekadao/gosend/internal/database"
-	"github.com/eurekadao/gosend/internal/server"
+	"github.com/eurekadao/gosend/sdk"
 )
 
 func main() {
@@ -15,17 +13,13 @@ func main() {
 	database.Connect(AppConfig.DB.GormConnection)
 	database.Migrate()
 
-	// Initialize AWS Defaults
-	keys := amazon.KmsKeys{
+	sdk := sdk.SdkConfig{
+		Instance:      database.Instance,
+		Region:        AppConfig.Aws.Region,
 		EncryptionKey: AppConfig.Aws.Kms.EncryptionKey,
 		JwtKey:        AppConfig.Aws.Kms.JwtKey,
+		Port:          AppConfig.WebServer.Port,
 	}
-	aws := amazon.BuildAWSClient(AppConfig.Aws.Region, keys)
-	aws.Init()
 
-	// Initialize Auth System
-	auth.Init()
-
-	// Start Web Server
-	server.StartWebServer(AppConfig.WebServer.Port)
+	sdk.Configure().Start()
 }

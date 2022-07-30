@@ -3,7 +3,7 @@ package database
 import (
 	"log"
 
-	"github.com/eurekadao/gosend/internal/models"
+	"github.com/eurekadao/gosend/models"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
@@ -25,4 +25,8 @@ func Migrate() {
 		&models.Email{},
 	)
 	log.Println("Database Migration Completed!")
+}
+
+func SdkDbStart(_instance *gorm.DB) {
+	Instance = _instance
 }
