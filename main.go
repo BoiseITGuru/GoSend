@@ -1,8 +1,11 @@
 package main
 
 import (
+	"github.com/eurekadao/gosend/internal/amazon"
+	"github.com/eurekadao/gosend/internal/auth"
+	"github.com/eurekadao/gosend/internal/controllers"
 	"github.com/eurekadao/gosend/internal/database"
-	"github.com/eurekadao/gosend/sdk"
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
@@ -13,13 +16,22 @@ func main() {
 	database.Connect(AppConfig.DB.GormConnection)
 	database.Migrate()
 
-	sdk := sdk.SdkConfig{
-		Instance:      database.Instance,
-		Region:        AppConfig.Aws.Region,
+	// Initialize AWS Defaults
+	keys := amazon.KmsKeys{
 		EncryptionKey: AppConfig.Aws.Kms.EncryptionKey,
 		JwtKey:        AppConfig.Aws.Kms.JwtKey,
-		Port:          AppConfig.WebServer.Port,
 	}
+	aws := amazon.BuildAWSClient(AppConfig.Aws.Region, keys)
 
-	sdk.Configure().Start()
+	aws.Init()
+
+	// Initialize Auth System
+	auth.Init()
+
+	r := gin.Default()
+
+	// SendGrid Email Receiver Endpoint
+	r.POST("/sendgrid", controllers.EmailReceiver)
+
+	r.Run(":" + AppConfig.WebServer.Port)
 }

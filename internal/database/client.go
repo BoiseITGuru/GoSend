@@ -3,7 +3,7 @@ package database
 import (
 	"log"
 
-	"github.com/eurekadao/gosend/models"
+	"github.com/eurekadao/gosend/internal/models"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
